@@ -6,6 +6,7 @@ import Header from './components/header'
 import LoginPage from './pages/loginPage'
 import AdminPage from './pages/adminPage'
 import Testing from './pages/testing'
+import { Toaster } from 'react-hot-toast'
 
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
 
   return (
       <BrowserRouter>
+      <Toaster position='top-right'/>
 
         <Routes path="/*">
             <Route path='/admin/*' element={<AdminPage/>}/>
