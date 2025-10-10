@@ -26,6 +26,14 @@ export default function LoginPage() {
   } else {
     console.log("Login successful", response.data);
     toast.success("Login successful");
+    localStorage.setItem("user",JSON.stringify(response.data));
+     
+    const user = response.data.user;
+    if(user.role==="admin"){
+        window.location.href="/admin"
+    }else{
+        window.location.href="/"
+    }
   }
 })
 .catch((error) => {
