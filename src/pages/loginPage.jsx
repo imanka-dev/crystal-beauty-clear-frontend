@@ -70,8 +70,10 @@ export default function LoginPage() {
                     setEmail(e.target.value)
                   }
                 } className="w-[400px] h-[50px] border border-white rounded-xl text-center m-[5px]" type="email" placeholder="email" />
-                <input onChange={
-                  (e)=>{
+
+
+                <input 
+                  onChange={(e)=>{
                     setPassword(e.target.value);
                   }
                 } className="w-[400px] h-[50px] border border-white rounded-xl text-center m-[5px] " type="password" placeholder="password" />
