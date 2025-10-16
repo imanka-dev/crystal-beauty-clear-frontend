@@ -28,7 +28,9 @@ export default function LoginPage() {
   } else {
     console.log("Login successful", response.data);
     toast.success("Login successful");
-    localStorage.setItem("user",JSON.stringify(response.data));
+    localStorage.setItem("token", response.data.token);
+    
+    // Redirect based on user role
      
     const user = response.data.user;
     if(user.role==="admin"){
