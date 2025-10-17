@@ -11,6 +11,7 @@ export default function AddProductForm() {
   const [labeledPrice, setLabeledPrice] = useState("");
   const [description, setDescription] = useState("");
   const [stock, setStock] = useState("");
+  const [images,setImages] = useState([])
   const navigate = useNavigate()//fly with page to page 
 
   function handleSubmit() {
@@ -100,6 +101,14 @@ export default function AddProductForm() {
           onChange={(e) => setDescription(e.target.value)}
           className="w-[400px] h-[100px] border border-gray-500 rounded-xl text-center m-[5px]"
           placeholder="Description"
+        />
+
+        <input type="file"
+          onChange={(e)=> {
+            setImages(e.target.files)
+          }}multiple
+          className="w-[400px] h-[50px] border border-gray-500 rounded-xl text-center m-[5px]"
+          placeholder="Product Images"
         />
 
         <input
