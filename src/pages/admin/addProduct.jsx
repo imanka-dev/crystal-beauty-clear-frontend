@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function AddProductForm() {
   const [productId, setProductId] = useState("");
@@ -11,6 +11,7 @@ export default function AddProductForm() {
   const [labeledPrice, setLabeledPrice] = useState("");
   const [description, setDescription] = useState("");
   const [stock, setStock] = useState("");
+  const navigate = useNavigate()//fly with page to page 
 
   function handleSubmit() {
     const altNamesInArray = altNames.split(",")
@@ -39,6 +40,7 @@ export default function AddProductForm() {
     }).then(
         ()=>{
             toast.success("product added successfully")
+            navigate("/admin/products")
         }
     ).catch(
         ()=>{
@@ -126,3 +128,5 @@ export default function AddProductForm() {
     </div>
   );
 }
+//https://ckblbonzyovxwswpxgub.supabase.co
+//eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNrYmxib256eW92eHdzd3B4Z3ViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA2MTM1NzksImV4cCI6MjA3NjE4OTU3OX0.IYRSIabJkYQxDxFbD3UhA2gLSqsE-6L2VhDUc3eZ2p4

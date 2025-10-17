@@ -1,35 +1,56 @@
 import { useState } from "react";
+import toast from "react-hot-toast";
+import mediaUpload from "../utils/mediaUpload";
 
-export default function Testing(){
-    const [number,setNumber] = useState(0)
-    const [status,setStatus] = useState("pending")
+export default function Testing() {
+  const [file, setFile] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
 
-    function increment(){
-        let newValue = number +1;
-        setNumber(newValue)
+  async function handleUpload() {
+    if (!file) {
+      toast.error("No file selected");
+      return;
     }
-    
-    function decrement(){
-        let newValue = number -1;
-        setNumber(newValue)
-    }
 
-    return(
-        <div className="w-full h-screen flex flex-col justify-center items-center">
-           <span className="text-3x1 font-bold">{number}</span>
-           <div className="w-full bg-red-900 flex justify-center items-center ">
-            <button onClick={increment} className="bg-blue-500 text-white p-2 rounded-lg w-[60px] cursor-pointer">+</button>
-            <button onClick={decrement} className="bg-blue-500 text-white p-2 rounded-lg w-[60px] cursor-pointer">-</button>
-           </div>
-           <span className="text-3x1 font-bold">{status}</span>
-           <div className="w-full bg-red-900 flex justify-center items-center ">
-            <button onClick={()=>{
-                setStatus ("Passed")
-            }} className="bg-blue-500 text-white p-2 rounded-lg w-[60px] cursor-pointer">Passed</button>
-            <button onClick={()=>{
-                setStatus ("Failed")
-            }} className="bg-blue-500 text-white p-2 rounded-lg w-[60px] cursor-pointer">Failed</button>
-           </div>
+    setLoading(true);
+    setProgress(0);
+
+    try {
+      const publicUrl = await mediaUpload(file, setProgress);
+      console.log("Uploaded URL:", publicUrl);
+      toast.success("File uploaded successfully!");
+    } catch (err) {
+      console.error("Upload error:", err);
+      toast.error(typeof err === "string" ? err : "File upload failed");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="w-full h-screen flex flex-col justify-center items-center gap-4">
+      <input
+        type="file"
+        onChange={(e) => setFile(e.target.files?.[0] || null)}
+      />
+
+      <button
+        onClick={handleUpload}
+        className="bg-gray-700 text-white p-2 rounded-lg cursor-pointer"
+        disabled={loading}
+      >
+        {loading ? `Uploading ${progress}%` : "Upload"}
+      </button>
+
+      {loading && (
+        <div className="w-64 bg-gray-300 rounded-full h-3">
+          <div
+            className="bg-green-500 h-3 rounded-full transition-all duration-300"
+            style={{ width: `${progress}%` }}
+          ></div>
         </div>
-    )
+      )}
+    </div>
+  );
 }
