@@ -2,6 +2,7 @@ import axios from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
+import mediaUpload from "../../utils/mediaUpload";
 
 export default function AddProductForm() {
   const [productId, setProductId] = useState("");
@@ -14,7 +15,20 @@ export default function AddProductForm() {
   const [images,setImages] = useState([])
   const navigate = useNavigate()//fly with page to page 
 
-  function handleSubmit() {
+  async function handleSubmit() {
+
+        const promisesArray = []
+        for(let i=0; i<images.length; i++){
+          const promise = mediaUpload(images[i])
+          promisesArray[i] = promise
+        }
+        const result = await Promise.all(promisesArray)
+        console.log(result)
+        
+
+
+
+
     const altNamesInArray = altNames.split(",")
     const product = {
         productId : productId,
@@ -24,34 +38,30 @@ export default function AddProductForm() {
         labeledPrice : labeledPrice,
         description : description,
         stock : stock,
-        images : [
-            "https://picsum.photos/id/106/200/300",
-            "https://picsum.photos/id/107/200/300",
-            "https://picsum.photos/id/108/200/300"
-        ]
+        images : result
     }
+    try{
+
+   
     const token = localStorage.getItem("token")
-    console.log(token)
-    axios.post(import.meta.env.VITE_URL + "/api/product", product ,{
+    
+   await axios.post(import.meta.env.VITE_URL + "/api/product", product ,{
         headers : {
             "Authorization" : "Bearer " + token
         }
 
 
-    }).then(
-        ()=>{
-            toast.success("product added successfully")
-            navigate("/admin/products")
-        }
-    ).catch(
-        ()=>{
-            toast.error("product adding failed")
-        }
-    )
+    })
+    toast.success("product adding success");
+    navigate("/admin/products");
+
+     }catch(error){
+      console.log(error)
+      toast.error("product adding failed")
+     }
 
 
-
-    toast.success("Form submitted");
+    
   }
 
   return (
@@ -106,7 +116,8 @@ export default function AddProductForm() {
         <input type="file"
           onChange={(e)=> {
             setImages(e.target.files)
-          }}multiple
+          }}
+          multiple
           className="w-[400px] h-[50px] border border-gray-500 rounded-xl text-center m-[5px]"
           placeholder="Product Images"
         />
