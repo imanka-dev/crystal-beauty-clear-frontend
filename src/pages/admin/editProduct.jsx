@@ -1,52 +1,62 @@
-// admin/editProduct.jsx
 import axios from "axios";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import mediaUpload from "../../utils/mediaUpload"; // CHANGED: added mediaUpload to handle file uploads
+import mediaUpload from "../../utils/mediaUpload"; // handles uploading new images
 
 export default function EditProductForm() {
-  const location = useLocation(); // CHANGED: receive product from navigate(..., { state: product })
-  const productFromState = location.state || null; // may be null if user navigated directly
+  const location = useLocation();
+  const productFromState = location.state || null;
   const navigate = useNavigate();
 
-  // CHANGED: use single product object to bind form fields
   const [product, setProduct] = useState(
     productFromState || {
       productId: "",
       name: "",
-      altNames: "", // CHANGED: keep altNames as comma string initially for the input
+      altNames: "",
       price: "",
       labeledPrice: "",
       description: "",
       stock: "",
-      images: [], // may contain urls (strings) or FileList (when user selects files)
+      images: [],
     }
   );
 
   const [loading, setLoading] = useState(false);
+  const [newImages, setNewImages] = useState([]);
 
-  // CHANGED: If user arrives with no state, warn (you could fetch by id here)
+  // 🧭 Redirect if no product passed (e.g. direct URL access)
   useEffect(() => {
     if (!productFromState) {
-      console.warn("No product data passed through location.state.");
+      toast.error("Invalid access — please select a product to edit.");
+      setTimeout(() => {
+        window.location.href = "/admin/products"; // ✅ redirect using window.location.href
+      }, 1500);
     }
   }, [productFromState]);
 
-  // CHANGED: generic handler for text/number inputs bound to product fields
   function handleChange(e) {
     const { name, value } = e.target;
     setProduct((prev) => ({ ...prev, [name]: value }));
   }
 
-  // CHANGED: handle file selection => set product.images to FileList
   function handleFileChange(e) {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      setProduct((prev) => ({ ...prev, images: files }));
-    } else {
-      setProduct((prev) => ({ ...prev, images: [] }));
+    const files = Array.from(e.target.files);
+    if (files.length > 0) {
+      setNewImages((prev) => [...prev, ...files]);
     }
+  }
+
+  function handleDeleteImage(index) {
+    setProduct((prev) => {
+      const updated = { ...prev };
+      updated.images = prev.images.filter((_, i) => i !== index);
+      return updated;
+    });
+  }
+
+  function handleDeleteNewImage(index) {
+    setNewImages((prev) => prev.filter((_, i) => i !== index));
   }
 
   async function handleSubmit(e) {
@@ -61,41 +71,18 @@ export default function EditProductForm() {
         return;
       }
 
-      // Prepare images: if images is a FileList (user selected new files), upload them
-      let existingImageUrls = [];
-      let newUploadedUrls = [];
-
-      // If productFromState existed and provided image URLs and user hasn't selected new files,
-      // product.images will already contain those URLs (strings). If user selected files, product.images is a FileList.
-      if (product.images && product.images.length > 0) {
-        const first = product.images[0];
-        if (first instanceof File) {
-          // CHANGED: upload new files
-          const promises = [];
-          for (let i = 0; i < product.images.length; i++) {
-            promises.push(mediaUpload(product.images[i]));
-          }
-          newUploadedUrls = await Promise.all(promises);
-        } else {
-          // images are existing URLs
-          existingImageUrls = product.images;
-        }
+      // Upload new images
+      let uploadedNewUrls = [];
+      if (newImages.length > 0) {
+        const uploads = newImages.map((file) => mediaUpload(file));
+        uploadedNewUrls = await Promise.all(uploads);
       }
 
-      // If there were existing URLs in productFromState and admin selected new files,
-      // you might want to append or replace — here we append new uploads to existing URLs
-      // CHANGED: handle case where initial productFromState had images stored separately
-      if (productFromState && Array.isArray(productFromState.images) && !(product.images && product.images[0] instanceof File)) {
-        // admin didn't pick new files; keep original URLs from productFromState
-        existingImageUrls = productFromState.images;
-      } else if (productFromState && Array.isArray(productFromState.images) && (product.images && product.images[0] instanceof File)) {
-        // admin picked new files; append newUploadedUrls to existing from state
-        existingImageUrls = productFromState.images;
-      }
+      const combinedImages = [
+        ...(Array.isArray(product.images) ? product.images : []),
+        ...uploadedNewUrls,
+      ];
 
-      const combinedImages = [...existingImageUrls, ...newUploadedUrls];
-
-      // CHANGED: convert altNames string to array (trim entries) for backend
       const altNamesArray =
         typeof product.altNames === "string"
           ? product.altNames.split(",").map((s) => s.trim()).filter(Boolean)
@@ -103,7 +90,6 @@ export default function EditProductForm() {
           ? product.altNames
           : [];
 
-      // Build payload (omit images if empty)
       const payload = {
         productId: product.productId,
         name: product.name,
@@ -115,10 +101,8 @@ export default function EditProductForm() {
         images: combinedImages,
       };
 
-      // CHANGED: Log payload for debugging
       console.log("PUT payload:", payload);
 
-      // Make sure backend expects PUT /api/product/:productId
       const url = `${import.meta.env.VITE_URL}/api/product/${product.productId}`;
 
       const res = await axios.put(url, payload, {
@@ -132,19 +116,15 @@ export default function EditProductForm() {
       toast.success("Product updated successfully");
       navigate("/admin/products");
     } catch (error) {
-      console.error("Update error (full):", error);
+      console.error("Update error:", error);
       if (error.response) {
-        console.error("Server response data:", error.response.data);
-        console.error("Server response status:", error.response.status);
         toast.error(
           error.response.data?.message ||
             `Error updating product (status ${error.response.status})`
         );
       } else if (error.request) {
-        console.error("No response received, request:", error.request);
-        toast.error("No response from server — check backend/CORS or server logs");
+        toast.error("No response from server — check backend or CORS");
       } else {
-        console.error("Error setting up request:", error.message);
         toast.error("Error updating product: " + error.message);
       }
     } finally {
@@ -154,11 +134,13 @@ export default function EditProductForm() {
 
   return (
     <div className="w-full h-full rounded-lg flex justify-center items-center">
-      <div className="w-[500px] h-[600px] bg-white rounded-lg shadow-lg flex flex-col items-center overflow-auto">
-        <h1 className="text-3xl font-bold text-gray-700 m-[10px]">Edit Product</h1>
+      <div className="w-[500px] h-[600px] bg-white rounded-lg shadow-lg flex flex-col items-center overflow-auto p-2">
+        <h1 className="text-3xl font-bold text-gray-700 m-[10px]">
+          Edit Product
+        </h1>
 
-        {/* CHANGED: Product ID input */}
         <input
+          disabled
           name="productId"
           value={product.productId ?? ""}
           onChange={handleChange}
@@ -166,7 +148,6 @@ export default function EditProductForm() {
           placeholder="Product ID"
         />
 
-        {/* CHANGED: Product Name */}
         <input
           name="name"
           value={product.name ?? ""}
@@ -175,7 +156,6 @@ export default function EditProductForm() {
           placeholder="Product Name"
         />
 
-        {/* CHANGED: Alternative Names (display comma string) */}
         <input
           name="altNames"
           value={
@@ -188,7 +168,6 @@ export default function EditProductForm() {
           placeholder="Alternative Names"
         />
 
-        {/* CHANGED: Price */}
         <input
           name="price"
           value={product.price ?? ""}
@@ -198,7 +177,6 @@ export default function EditProductForm() {
           placeholder="Price"
         />
 
-        {/* CHANGED: Labeled Price */}
         <input
           name="labeledPrice"
           value={product.labeledPrice ?? ""}
@@ -208,7 +186,6 @@ export default function EditProductForm() {
           placeholder="Labeled Price"
         />
 
-        {/* CHANGED: Description */}
         <textarea
           name="description"
           value={product.description ?? ""}
@@ -217,32 +194,64 @@ export default function EditProductForm() {
           placeholder="Description"
         />
 
-        {/* CHANGED: File input for images */}
-        <input
-          type="file"
-          onChange={handleFileChange}
-          multiple
-          className="w-[400px] h-[50px] border border-gray-500 rounded-xl text-center m-[5px]"
-          placeholder="Product Images"
-        />
+        {/* Image Section */}
+        <div className="w-[400px] mt-3 mb-2">
+          <h2 className="text-lg font-semibold mb-1 text-gray-700">
+            Product Images
+          </h2>
 
-        {/* CHANGED: preview existing image URLs if present and not FileList */}
-        {product.images &&
-          product.images.length > 0 &&
-          !(product.images[0] instanceof File) && (
-            <div className="w-[400px] flex flex-wrap gap-2 my-2 justify-center">
+          {/* Existing Images */}
+          {product.images && product.images.length > 0 && (
+            <div className="flex flex-wrap gap-2 justify-center mb-2">
               {product.images.map((imgUrl, idx) => (
-                <img
-                  key={idx}
-                  src={imgUrl}
-                  alt={`img-${idx}`}
-                  className="w-16 h-16 object-cover rounded-md"
-                />
+                <div key={idx} className="relative">
+                  <img
+                    src={imgUrl}
+                    alt={`img-${idx}`}
+                    className="w-16 h-16 object-cover rounded-md border"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteImage(idx)}
+                    className="absolute top-[-6px] right-[-6px] bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5"
+                  >
+                    ✖
+                  </button>
+                </div>
               ))}
             </div>
           )}
 
-        {/* CHANGED: Stock */}
+          {/* New Images */}
+          {newImages.length > 0 && (
+            <div className="flex flex-wrap gap-2 justify-center mb-2">
+              {newImages.map((file, idx) => (
+                <div key={idx} className="relative">
+                  <img
+                    src={URL.createObjectURL(file)}
+                    alt={`new-${idx}`}
+                    className="w-16 h-16 object-cover rounded-md border"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteNewImage(idx)}
+                    className="absolute top-[-6px] right-[-6px] bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5"
+                  >
+                    ✖
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <input
+            type="file"
+            onChange={handleFileChange}
+            multiple
+            className="w-[400px] h-[50px] border border-gray-500 rounded-xl text-center"
+          />
+        </div>
+
         <input
           name="stock"
           value={product.stock ?? ""}
@@ -264,7 +273,7 @@ export default function EditProductForm() {
             disabled={loading}
             className="bg-blue-500 disabled:opacity-50 text-white p-[10px] w-[180px] text-center rounded-lg cursor-pointer hover:bg-blue-600 transition duration-300"
           >
-            {loading ? "Saving..." : "Edit Product"}
+            {loading ? "Saving..." : "Save Changes"}
           </button>
         </div>
       </div>
