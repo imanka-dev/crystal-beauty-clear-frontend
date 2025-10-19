@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -126,6 +126,12 @@ export default function LoginPage() {
               "Login"
             )}
           </button>
+          <p className="text-gray-600 text-center m-[10px]">
+            Don't have an account yet?
+            <span className="text-blue-500 ml-2 cursor-pointer" onClick={() => navigate("/register")}>
+              <Link to="/register">Register Now</Link>
+            </span>
+          </p>
         </div>
       </div>
     </div>
