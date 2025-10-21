@@ -1,6 +1,6 @@
 import axios from "axios"
 import { useEffect, useState } from "react"
-import Loader from "../../components/loader"
+import Loader from "../../components/loader/"
 import ProductCard from "../../components/product-card"
 
 
