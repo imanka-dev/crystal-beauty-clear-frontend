@@ -8,7 +8,7 @@ export default function HomePage() {
     <div className="w-full h-screen  ">
       <Header />
 
-      <div className="w-full min-h-[calc(100vh-70px)] ">
+      <div className="w-full h-[calc(100vh-70px)] min-h-[calc(100vh-70px)] ">
         <Routes>
           {/* ✅ Use relative paths, not absolute */}
           <Route path="/" element={<h1>Home Page</h1>} />
