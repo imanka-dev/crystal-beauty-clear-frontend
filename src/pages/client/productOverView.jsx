@@ -4,6 +4,7 @@ import Loader from "../../components/loader";
 import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { FaStar } from "react-icons/fa6";
+import getCart, { addToCart } from "../../utils/cart";
 
 // ⭐ Enhanced Star Rating Component (merged version)
 function StarRating({ productId, initialRating }) {
@@ -118,7 +119,7 @@ export default function ProductOverView() {
       )}
 
       {status === "loaded" && product && (
-        <div className="max-w-6xl w-full bg-white rounded-2xl shadow-lg p-8 grid md:grid-cols-2 gap-10">
+        <div className="max-w-6xl w-full  bg-white rounded-2xl shadow-lg p-8 grid md:grid-cols-2 gap-10">
           {/* Left: Product Images */}
           <div className="flex flex-col items-center">
             <div className="w-full max-w-md h-[400px] rounded-xl overflow-hidden border">
@@ -148,7 +149,7 @@ export default function ProductOverView() {
           </div>
 
           {/* Right: Product Info */}
-          <div className="flex flex-col justify-between space-y-6">
+          <div className="flex flex-col justify-between space-y-6 ">
             <div>
               <p className="text-gray-500 mt-2 text-sm">
                 Product ID: {product.productId}
@@ -182,10 +183,16 @@ export default function ProductOverView() {
             </p>
 
             <div className="flex gap-4 mt-6">
-              <button className="px-6 py-3 bg-pink-500 hover:bg-pink-600 text-white font-medium rounded-xl shadow-md transition-all">
+              <button className="px-6 py-3 bg-pink-500 hover:bg-pink-600 text-white font-medium rounded-xl shadow-md transition-all cursor-pointer" onClick={
+                ()=>{
+                  addToCart(product,1)
+                  toast.success("product added to cart")
+                  console.log(getCart())
+                }
+              }>
                 Add to Cart
               </button>
-              <button className="px-6 py-3 bg-gray-900 hover:bg-black text-white font-medium rounded-xl shadow-md transition-all">
+              <button className="px-6 py-3 bg-gray-700 hover:bg-black text-white font-medium rounded-xl shadow-md transition-all cursor-pointer">
                 Buy Now
               </button>
             </div>
