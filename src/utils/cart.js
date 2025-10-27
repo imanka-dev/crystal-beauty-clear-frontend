@@ -47,3 +47,36 @@ export function addToCart(product,qty){
         localStorage.setItem("cart",JSON.stringify(cart))
         return cart
     }
+
+   export function getTotal() {
+    // ❌ old: let cart = getCart;  (you forgot parentheses)
+    // ✅ fix: call the function
+    let cart = getCart();
+
+    let total = 0;
+
+    // ✅ optional safety check
+    if (!Array.isArray(cart)) {
+        return 0;
+    }
+
+    // ❌ old: total += product.price * item.quantity
+    //    ‘item’ is not defined; you meant ‘product’
+    // ✅ fix:
+    cart.forEach((product) => {
+        total += product.price * product.quantity;
+    });
+
+    // ✅ return value at the end
+    return total;
+}
+
+export function getTotalForLabelledPrice(){
+    let cart = getCart();
+    let total = 0;
+
+    cart.forEach((product) => {
+            total += product.labeledPrice * product.quantity
+    });
+    return total;
+}

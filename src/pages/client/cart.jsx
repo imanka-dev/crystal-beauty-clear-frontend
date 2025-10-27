@@ -1,5 +1,5 @@
 import { TbTrash } from "react-icons/tb"
-import getCart, { addToCart, removeFromCart } from "../../utils/cart"
+import getCart, { addToCart, getTotal, getTotalForLabelledPrice, removeFromCart } from "../../utils/cart"
 import { useEffect, useState } from "react"
 
 export default function CartPage(){
@@ -34,7 +34,7 @@ export default function CartPage(){
                                     <h2 className="text-sm text-gray-500">{item.altName.join(" | ")}</h2>
                                     <h2 className="text-lg text-gray-700">LKR:{item.price.toFixed(2)}</h2>
                                 </div>
-                                    <div className="h-full w-[100px] flex justify-center items-center">
+                                    <div className="h-full w-[100px] flex justify-center items-center ">
                                         <button className=" text-2xl w-[30px] h-[30px] flex justify-center items-center bg-black text-white rounded-full  cursor-pointer mx-[5px]"
                                         onClick={()=>{
                                             addToCart(item, -1)
@@ -47,8 +47,8 @@ export default function CartPage(){
                                             setCartLoaded(false)
                                         }}>+</button>
                                     </div>
-                                     <div className="h-full w-[100px] flex justify-center items-center">
-                                        <h1 className="text-xl font-bold "> LKR: {(item.price*item.quantity).toFixed(2)} </h1>
+                                     <div className="h-full w-[100px] flex justify-center items-center mx-[5px]">
+                                        <h1 className="text-xl text-end font-bold "> LKR: {(item.price*item.quantity).toFixed(2)} </h1>
                                     </div>
                             </div>
                         )
@@ -56,10 +56,21 @@ export default function CartPage(){
 
                     })
                 }
+                <div className="w-full h-[100px] flex justify-end  ">
+                                <h1 className="w-[100px]  px-4  text-xl text-center font-bold ">Net Total</h1>
+                                <h1 className="w-[100px]  px-4  text-xl text-center font-bold ">
+                                         LKR: {getTotalForLabelledPrice().toFixed(2)}
+                                 </h1>
+                </div>
+                <div className="w-full h-[100px] flex justify-end  ">
+                                <h1 className="w-[100px]  px-4  text-xl text-center font-bold ">Net Total</h1>
+                                <h1 className="w-[100px]  px-4  text-xl text-center font-bold ">
+                                         LKR: {getTotal().toFixed(2)}
+                                 </h1>
+                </div>
+
 
             </div>
-
-
         </div>
     )
 }
