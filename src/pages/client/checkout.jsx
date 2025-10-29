@@ -1,22 +1,15 @@
 import { TbTrash } from "react-icons/tb"
 import getCart, { addToCart, getTotal, getTotalForLabelledPrice, removeFromCart } from "../../utils/cart"
 import { useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 
-export default function CartPage(){
+export default function CheckOutPage(){
 
-    const [cartLoaded , setCartLoaded] = useState(false)
+    const location = useLocation()
     const [cart , setCart] = useState([])
     const navigate = useNavigate()
 
 
-    useEffect(()=>{
-        if(cartLoaded == false){
-            const cart = getCart()
-            setCart(cart)
-            setCartLoaded(true)
-        }
-    },[cartLoaded])
     return(
         <div className="w-full h-full flex justify-center ">
 
