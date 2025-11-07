@@ -1,17 +1,35 @@
 import { TbTrash } from "react-icons/tb"
-import getCart, { addToCart, getTotal, getTotalForLabelledPrice, removeFromCart } from "../../utils/cart"
-import { useEffect, useState } from "react"
+import { getTotal, getTotalForLabelledPrice, } from "../../utils/cart"
+import { useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 
 export default function CheckOutPage(){
+    
+    const location = useLocation();
+    const [cart,setCart] = useState(location.state.items)
+    const [cartRefresh,setCartRefresh] = useState(false)
+    const navigate = useNavigate();
 
-    const location = useLocation()
-    const [cart , setCart] = useState([])
-    const navigate = useNavigate()
+
+    function getTotal(){
+        let total = 0
+        cart.forEach((item)=>{
+            total += item.price * item.quantity
+        })
+        return total
+    }
+
+    function getTotalForLabelledPrice(){
+        let total = 0
+        cart.forEach((item)=>{
+            total += item.labeledPrice * item.quantity
+        })
+        return total
+    }
 
 
     return(
-        <div className="w-full h-full flex justify-center ">
+        <div className="w-full h-full flex justify-center p-[40px]">
 
             <div className="w-[700px]">
                 {
@@ -19,10 +37,11 @@ export default function CheckOutPage(){
                         return(
                             <div key={index} className="w-full h-[100px] bg-white shadow-2xl my-[5px]  flex justify-between items-center relative">
                                 <button className="absolute right-[-50px] bg-red-500 w-[40px] h-[40px] rounded-full text-white flex justify-center items-center shadow cursor-pointer"
-                                onClick={()=>{
-                                    removeFromCart(item.productId)
-                                    setCartLoaded(false)
-                                }}>
+                               onClick={()=>{
+                                const newCart = cart.filter((product) => product.productId !== item.productId)
+                                setCart(newCart)
+                                setCartRefresh(!cartRefresh)
+                            }}>
                                     <TbTrash />
                                 </button>
                                 <img src={item.image} className="h-full aspect-square object-cover" />
@@ -33,15 +52,25 @@ export default function CheckOutPage(){
                                 </div>
                                     <div className="h-full w-[100px] flex justify-center items-center ">
                                         <button className=" text-2xl w-[30px] h-[30px] flex justify-center items-center bg-black text-white rounded-full  cursor-pointer mx-[5px]"
-                                        onClick={()=>{
-                                            addToCart(item, -1)
-                                            setCartLoaded(false)
+                                        onClick={()=>{ 
+                                            const newCart = cart
+                                            console.log(newCart)
+                                            newCart[index].quantity -= 1
+                                            if (newCart[index].quantity <= 0) newCart[index].quantity = 1
+                                            setCart(newCart)
+                                            setCartRefresh(!cartRefresh)
+                                            
                                         }}>-</button>
                                         <h1 className="text-xl font-bold "> {item.quantity} </h1>
                                         <button className=" text-2xl w-[30px] h-[30px] flex justify-center items-center bg-black text-white rounded-full  cursor-pointer mx-[5px]"
                                         onClick={()=>{
-                                            addToCart(item, 1)
-                                            setCartLoaded(false)
+                                            
+                                            const newCart = cart
+                                            console.log(newCart)
+                                            newCart[index].quantity += 1
+                                            setCart(newCart)
+                                            setCartRefresh(!cartRefresh)
+                                            
                                         }}>+</button>
                                     </div>
                                      <div className="h-full w-[150px] flex justify-end items-center mx-[5px]">
@@ -83,7 +112,7 @@ export default function CheckOutPage(){
                                         }
                                     )
                                 }}>
-                                    abcd
+                                    Check Out
                                 </button>
                                        
                                  
