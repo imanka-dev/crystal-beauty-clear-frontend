@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import Loader from "../../components/loader";
-import { useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { FaStar } from "react-icons/fa6";
 import getCart, { addToCart } from "../../utils/cart";
@@ -12,6 +12,7 @@ function StarRating({ productId, initialRating }) {
   const [hover, setHover] = useState(0);
   const [loading, setLoading] = useState(false);
   const [average, setAverage] = useState(initialRating || 0);
+  
 
   // ✅ Send rating to backend & update average
   async function handleRate(value) {
@@ -83,6 +84,8 @@ function StarRating({ productId, initialRating }) {
 // 🛍️ Main Component
 export default function ProductOverView() {
   const params = useParams();
+  const navigate = useNavigate();
+
   if (params.id == null) {
     window.location.href = "/products";
   }
@@ -192,7 +195,25 @@ export default function ProductOverView() {
               }>
                 Add to Cart
               </button>
-              <button className="px-6 py-3 bg-gray-700 hover:bg-black text-white font-medium rounded-xl shadow-md transition-all cursor-pointer">
+              <button
+                  onClick={()=>{
+                    navigate("/checkout",{
+                      state : {
+                        items : [
+                          {
+                              productId : product.productId,
+                              name : product.name,
+                              altName : product.altName,   // singular, matches backend field name
+                              price : product.price,
+                              labeledPrice : product.labeledPrice,
+                              image : product.images[0],
+                              quantity : 1
+                          }
+                        ]
+                      }
+                    })
+                  }}
+                  className="px-6 py-3 bg-gray-700 hover:bg-black text-white font-medium rounded-xl shadow-md transition-all cursor-pointer">
                 Buy Now
               </button>
             </div>

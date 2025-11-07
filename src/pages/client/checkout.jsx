@@ -1,5 +1,5 @@
 import { TbTrash } from "react-icons/tb"
-import { getTotal, getTotalForLabelledPrice, } from "../../utils/cart"
+
 import { useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 
@@ -112,7 +112,7 @@ export default function CheckOutPage(){
                                         }
                                     )
                                 }}>
-                                    Check Out
+                                    Place Oder
                                 </button>
                                        
                                  
