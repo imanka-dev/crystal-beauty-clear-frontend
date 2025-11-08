@@ -2,13 +2,75 @@ import { TbTrash } from "react-icons/tb"
 
 import { useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
+import axios from "axios";
+import toast from "react-hot-toast";
 
 export default function CheckOutPage(){
     
     const location = useLocation();
     const [cart,setCart] = useState(location.state.items)
     const [cartRefresh,setCartRefresh] = useState(false)
+    const [name, setName] = useState("");
+    const [email,setEmail] = useState("");
+    const [address,setAddress] = useState("");
+    const [phoneNumber,setPhoneNumber] = useState("");
+
+
+
     const navigate = useNavigate();
+
+    /*
+    {
+  "name": "jane smith",
+  "email": "janesmith@examplae.com",
+  "address": "456 Galle Road, Colombo",
+  "phoneNumber": "0712345678",
+  "billItem": [
+    {
+      "productId": "COSM-005",
+      "quantity": 2
+      
+    },
+    {
+      "productId": "COSM-006",
+      "quantity": 3
+    }
+  ]
+ 
+}
+
+    */
+   function placeOder(){
+    const oderData = {
+        name : name,
+        email: email,
+        address : address,
+        phoneNumber : phoneNumber,
+        billItem : []
+         }
+        for(let i = 0; i< cart.length; i++){
+            oderData.billItem[i] = {
+                productId : cart[i].productId,
+                quantity : cart[i].quantity
+            }
+         }
+         const token = localStorage.getItem("token");
+         axios.post(import.meta.env.VITE_URL + "/api/oder", oderData, {
+                    headers: {
+            
+            Authorization: "Bearer " + token,
+            
+        },
+
+         }).then(()=>{
+            toast.success("Oder Placed Successfully")
+            navigate("/");
+
+         }).catch((error)=>{
+            console.log(error);
+            toast.error("Oder Placement Failed");
+         })
+   }
 
 
     function getTotal(){
@@ -102,16 +164,47 @@ export default function CheckOutPage(){
                                          LKR: {getTotal().toFixed(2)}
                                  </h1>
                 </div>
+
+                <div className="w-full h-[50px] flex justify-end ">
+                                <h1 className="w-[150px]   text-xl text-center flex justify-end items-center mx[5px] font-bold  ">Name</h1>
+                                <input
+                                    className="w-[200px] text-xl border-b-[2px] text-end pr-2"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    />
+                </div>
+
+                 <div className="w-full h-[50px] flex justify-end ">
+                                <h1 className="w-[150px]   text-xl text-center flex justify-end items-center mx[5px] font-bold  ">Email</h1>
+                                <input
+                                    className="w-[200px] text-xl border-b-[2px] text-end pr-2"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    />
+                </div>
+
+                 <div className="w-full h-[50px] flex justify-end ">
+                                <h1 className="w-[150px]   text-xl text-center flex justify-end items-center mx[5px] font-bold  ">address</h1>
+                                <input
+                                    className="w-[200px] text-xl border-b-[2px] text-end pr-2"
+                                    value={address}
+                                    onChange={(e) => setAddress(e.target.value)}
+                                    />
+                </div>
+
+                 <div className="w-full h-[50px] flex justify-end ">
+                                <h1 className="w-[150px]   text-xl text-center flex justify-end items-center mx[5px] font-bold  ">Phone Number</h1>
+                                <input
+                                    className="w-[200px] text-xl border-b-[2px] text-end pr-2"
+                                    value={phoneNumber}
+                                    onChange={(e) => setPhoneNumber(e.target.value)}
+                                    />
+                </div>
+
                 <div className="w-full flex justify-end mt-4">
-                                <button className="w-[170px] text-xl text-center shadow pr-2 cursor-pointer bg-pink-400 text-white h-[40px] rounded-lg " onClick={()=>{
-                                    navigate("/checkout",
-                                        {
-                                            state : {
-                                                items : cart
-                                            }
-                                        }
-                                    )
-                                }}>
+                                <button className="w-[170px] text-xl text-center shadow pr-2 cursor-pointer bg-pink-400 text-white h-[40px] rounded-lg " 
+                                  onClick={placeOder}                                    
+                                >
                                     Place Oder
                                 </button>
                                        
