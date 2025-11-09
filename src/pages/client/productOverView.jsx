@@ -195,27 +195,7 @@ export default function ProductOverView() {
               }>
                 Add to Cart
               </button>
-              <button
-                  onClick={()=>{
-                    navigate("/checkout",{
-                      state : {
-                        items : [
-                          {
-                              productId : product.productId,
-                              name : product.name,
-                              altName : product.altName,   // singular, matches backend field name
-                              price : product.price,
-                              labeledPrice : product.labeledPrice,
-                              image : product.images[0],
-                              quantity : 1
-                          }
-                        ]
-                      }
-                    })
-                  }}
-                  className="px-6 py-3 bg-gray-700 hover:bg-black text-white font-medium rounded-xl shadow-md transition-all cursor-pointer">
-                Buy Now
-              </button>
+              
             </div>
           </div>
         </div>
