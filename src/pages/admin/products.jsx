@@ -79,7 +79,10 @@ export default function AdminProductsPage() {
                       onClick={() => deleteProduct(product.productId)}
                     />
                   )}
-                  
+                  <GrEdit
+                    onClick={() => navigate("/admin/editProduct", { state: product })}
+                    className="text-[25px] m-[10px] hover:text-blue-500 cursor-pointer"
+                  />
                 </div>
               </td>
             </tr>
