@@ -63,14 +63,14 @@ export default function CartPage(){
                 <div className="w-full  flex justify-end ">
                                 <h1 className="w-[150px]  text-xl text-center flex justify-end  mx-[5px] ">Total : </h1>
                                 <h1 className="w-[150px]   text-xl text-center flex justify-end  mx-[5px]  ">
-                                        LKR: {getTotalForLabelledPrice().toFixed(2)}
+                                        LKR:  {getTotalForLabelledPrice().toFixed(2)}
                                  </h1>
                 </div>
 
                  <div className="w-full flex justify-end ">
                                 <h1 className="w-[150px]  text-xl text-center flex justify-end  mx-[5px] ">Discount : </h1>
                                 <h1 className="w-[150px]   text-xl text-center flex justify-end  mx-[5px] border-b-[2px]  ">
-                                        LKR: {(getTotalForLabelledPrice()- getTotal()).toFixed(2)}
+                                        LKR:  {(getTotalForLabelledPrice()- getTotal()).toFixed(2)}
                                  </h1>
                 </div>
 
@@ -90,7 +90,7 @@ export default function CartPage(){
                                         }
                                     )
                                 }}>
-                                    abcd
+                                    Check Out
                                 </button>
                                        
                                  
