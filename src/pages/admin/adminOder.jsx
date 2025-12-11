@@ -1,13 +1,15 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import Loader from "../../components/loader";
+import { IoMdCloseCircleOutline } from "react-icons/io";
 
 
 
 export default function AdminOrderPage() {
-    const [orders, setOrders] = useState([])
-    const [loaded, setLoaded] = useState(false)
-    const [modalIsDisplaying, setModalIsDisplaying] = useState(false)
+    const [orders, setOrders] = useState([]);
+    const [loaded, setLoaded] = useState(false);
+    const [modalIsDisplaying, setModalIsDisplaying] = useState(false);
+    const [displayingOrder, setDisplayingOrder] = useState(null);
 
 
 
@@ -21,7 +23,7 @@ export default function AdminOrderPage() {
                     }
                 }).then(response => {
                     console.log(response.data)
-                    setOrders(response.data)
+                    setOrders(response.data) 
                     setLoaded(true)
                 }).catch(error => {
                     console.error("Error fetching orders:", error)
@@ -32,59 +34,66 @@ export default function AdminOrderPage() {
     )
 
     /*
-    Date
-: 
-"2025-10-02T08:07:19.291Z"
-address
-: 
-"456 Galle Road, Colombo"
-billItem
-: 
-[]
-email
-: 
-"janesmith@example.com"
-name
-: 
-"Jane Smith"
-oderId
-: 
-"ORD0001"
-phoneNumber
-: 
-"0712345678"
-states
-: 
-"Pending"
-total
-: 
-0
-__v
-: 
-0
-_id
-: 
-"68de32b708a3568038bf0f5f"
+    {
+    "_id": "69314a28c72068f181d5d9d9",
+    "oderId": "ORD0016",
+    "email": "imanka@gmail.com",
+    "name": "imanka silva",
+    "address": "190/a walpola ragama",
+    "states": "Pending",
+    "phoneNumber": "0725107553",
+    "billItem": [
+        {
+            "productId": "COSM-006",
+            "productName": "Vitamin C Brightening Serum",
+            "Image": "https://ckblbonzyovxwswpxgub.supabase.co/storage/v1/object/public/images/1760893271694_cosmetics-03.jpg",
+            "quantity": 3,
+            "price": 32.5,
+            "_id": "69314a28c72068f181d5d9da"
+        },
+        {
+            "productId": "COSM-005",
+            "productName": "Rose Glow Hydrating Toner",
+            "Image": "https://ckblbonzyovxwswpxgub.supabase.co/storage/v1/object/public/images/1760893377215_cosmetics-02.jpg",
+            "quantity": 1,
+            "price": 18.99,
+            "_id": "69314a28c72068f181d5d9db"
+        },
+        {
+            "productId": "COSM-001",
+            "productName": "Face Cream",
+            "Image": "https://ckblbonzyovxwswpxgub.supabase.co/storage/v1/object/public/images/1760893243906_cosmetics-05.jpg",
+            "quantity": 1,
+            "price": 5000.25,
+            "_id": "69314a28c72068f181d5d9dc"
+        }
+    ],
+    "total": 5116.74,
+    "Date": "2025-12-04T08:45:28.961Z",
+    "__v": 0
+}
 
     */
 
     return (
-        <div className="w-full h-full">
+        <div className="w-full h-full p-4 overflow-auto">
             
             {
                 loaded ? 
                 <div className="w-full h-full">
-                   <table className="w-full">
-                    <thead>
+                   
+                   <div className="overflow-x-auto">
+                   <table className="w-full border-collapse">
+                    <thead className="bg-gray-100">
                         <tr>
-                            <th>Oder ID</th>
-                            <th>Customer Email</th>
-                            <th>Customer Name</th>
-                            <th>Address</th>
-                            <th>Phone Number</th>                           
-                            <th>Status</th>
-                            <th>Total</th>
-                            <th>Date</th>
+                            <th className="p-3 text-left border-b-2 border-gray-300">Order ID</th>
+                            <th className="p-3 text-left border-b-2 border-gray-300">Customer Email</th>
+                            <th className="p-3 text-left border-b-2 border-gray-300">Customer Name</th>
+                            <th className="p-3 text-left border-b-2 border-gray-300">Address</th>
+                            <th className="p-3 text-left border-b-2 border-gray-300">Phone Number</th>                           
+                            <th className="p-3 text-left border-b-2 border-gray-300">Status</th>
+                            <th className="p-3 text-left border-b-2 border-gray-300">Total</th>
+                            <th className="p-3 text-left border-b-2 border-gray-300">Date</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -97,14 +106,40 @@ _id
                                     <tr
                                         key={order.oderId}
                                         className="border-b-2 border-gray-300 text-center hover:bg-gray-200"
-                                        onClick={() => setModalIsDisplaying(true)}
+                                        onClick={() =>{ 
+                                            setModalIsDisplaying(true)
+                                            setDisplayingOrder(order)
+                                            
+                                        }}
                                        >
                                         <td className="p-2">{order.oderId}</td>
                                         <td className="p-2">{order.email}</td>
                                         <td className="p-2">{order.name}</td>
                                         <td className="p-2">{order.address}</td>
                                         <td className="p-2">{order.phoneNumber}</td>
-                                        <td className="p-2">{order.states}</td>
+                                        <td className="p-2">
+                                            <select 
+                                                value={order.states}
+                                                onChange={(e) => {
+                                                    e.stopPropagation();
+                                                    // Update order status logic here
+                                                    const updatedOrders = orders.map(o => 
+                                                        o.oderId === order.oderId 
+                                                            ? { ...o, states: e.target.value } 
+                                                            : o
+                                                    );
+                                                    setOrders(updatedOrders);
+                                                }}
+                                                onClick={(e) => e.stopPropagation()}
+                                                className="border border-gray-300 rounded px-2 py-1"
+                                            >
+                                                <option value={"Pending"}>Pending</option>
+                                                <option value={"Shipped"}>Shipped</option>
+                                                <option value={"Delivered"}>Delivered</option>
+                                                <option value={"Cancelled"}>Cancelled</option>
+                                            </select>
+                                        </td>
+
                                         <td className="p-2">{order.total.toFixed(2)}</td>
                                         <td className="p-2">{new Date(order.Date).toLocaleDateString()}</td>
 
@@ -115,14 +150,43 @@ _id
 
                     }
                    </table>
+                   </div>
                    {
                     modalIsDisplaying &&
-                    <div className="fixed bg-[#00000080] top-0 left-0 w-full h-full">
-                        <div className="w-[600px] h-[400px] bg-white rounded-lg absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-4">
-
+                    <div className="fixed bg-[#00000080] top-0 left-0 w-full h-full flex justify-center items-center">
+                        <div className="w-[600px] max-w-[600px] h-[600px] max-h-[600px] bg-white relative rounded-lg flex flex-col items-center p-4">
+                            <div className="w-full h-[150px] rounded-t-lg">
+                                <h1 className="text-sm font-bold p-2">Order ID: {displayingOrder.oderId}</h1>
+                                <h1 className="text-sm font-bold p-2">Order Date: {new Date(displayingOrder.Date).toLocaleDateString()}</h1>
+                                <h1 className="text-sm font-bold p-2">Order Status: {displayingOrder.states}</h1>
+                                <h1 className="text-sm font-bold p-2">Order Total: Rs{displayingOrder.total.toFixed(2)}</h1>
+                                
+                            </div>
+                            
+                            <button onClick={() => setModalIsDisplaying(false)} className="absolute -top-8 -right-8 z-10  rounded-full p-1">
+                                <IoMdCloseCircleOutline className="text-3xl text-white hover:text-red-700 cursor-pointer"/>
+                            </button>
+                            <div className="w-[600px] h-[400px] bg-white rounded-lg max-h-[400px] overflow-hidden">
+                                <div className="w-full h-[450px] max-h-[450px] overflow-y-scroll scrollbar-hide">
+                                    {displayingOrder.billItem.map(
+                                        (item,index)=>{
+                                            return (
+                                                <div key={index} className="w-full h-[100px] flex border-b-2 border-gray-300 p-2">
+                                                    <img src={item.Image} alt={item.productName} className="w-[80px] h-[80px] object-cover rounded-lg"/>
+                                                    <div className="ml-4 flex flex-col justify-center"> 
+                                                        <h1 className="font-bold">{item.productName}</h1>
+                                                        <h1>Quantity: {item.quantity}</h1>
+                                                        <h1>Price: Rs{item.price.toFixed(2)}</h1>   
+                                                    </div>
+                                                </div>
+                                            )
+                                        }
+                                    )}
+                                </div>
+                            </div>
                         </div>
                         
-                    </div>
+                    </div> 
                    }
                 </div>
                 :
