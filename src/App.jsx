@@ -9,12 +9,14 @@ import AdminPage from './pages/adminPage'
 import Testing from './pages/testing'
 import { Toaster } from 'react-hot-toast'
 import HomePage from './pages/homePage';
+import { GoogleOAuthProvider } from '@react-oauth/google'
 
 
 function App() {
   
 
   return (
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
       <BrowserRouter>
       <Toaster position='top-right'/>
 
@@ -32,6 +34,7 @@ function App() {
 
       
       </BrowserRouter>
+    </GoogleOAuthProvider>
   );
 }
 

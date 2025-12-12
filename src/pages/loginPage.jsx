@@ -1,6 +1,8 @@
+import { useGoogleLogin } from "@react-oauth/google";
 import axios from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { GrGoogle } from "react-icons/gr";
 import { Link, useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
@@ -8,6 +10,52 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false); // CHANGED: correct initial value
   const navigate = useNavigate();
+  const loginWithGoogle = useGoogleLogin(
+    {
+      onSuccess : (res)=>{
+        setLoading(true);
+        axios.post(import.meta.env.VITE_URL + "/api/user/google-login",{
+          accessToken : res.access_token
+        }).then(
+          (response)=>{
+             // CHANGED: stop loading (if navigating, component may unmount but safe to set)
+        setLoading(false);
+
+        // Defensive: ensure response.data exists
+        const data = response.data || {};
+
+        // CHANGED: check server response properly
+        if (data.success === false || data.message === "Invalid email") {
+          console.log("Login failed", data);
+          toast.error(data.message || "Login failed");
+          return;
+        }
+
+        // Success
+        console.log("Login successful", data);
+        toast.success("Login successful");
+
+        if (data.token) {
+          localStorage.setItem("token", data.token);
+        }
+
+        // Redirect based on user role
+        const user = data.user || {};
+        if (user.role === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/");
+        }
+      })
+      .catch((error) => {
+        // CHANGED: stop loading on error too
+        setLoading(false);
+
+          }
+        )
+      }
+    }
+  )
 
   function handleLogin() {
     // CHANGED: start loading immediately
@@ -125,6 +173,13 @@ export default function LoginPage() {
             ) : (
               "Login"
             )}
+          </button>
+          <button className={`w-[400px] h-[50px] ${
+              loading ? "bg-gray-400 cursor-not-allowed" : "bg-green-500"
+            } text-white rounded-xl mt-2 flex items-center justify-center`} onClick={()=>loginWithGoogle()}>
+                <GrGoogle className="mr-2" />
+
+                {loading ? "Loading..." : "Sign in with Google"}
           </button>
           <p className="text-gray-600 text-center m-[10px]">
             Don't have an account yet?

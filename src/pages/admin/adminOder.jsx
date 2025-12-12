@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import Loader from "../../components/loader";
 import { IoMdCloseCircleOutline } from "react-icons/io";
+import toast from "react-hot-toast";
 
 
 
@@ -74,6 +75,22 @@ export default function AdminOrderPage() {
 }
 
     */
+    
+    function changeOrderStatus(oderId,status) {
+        const token = localStorage.getItem("token");
+        axios.put(import.meta.env.VITE_URL + "/api/oder/" + oderId,
+            { states: status },
+            {
+                headers: { Authorization: "Bearer " + token },
+            }
+        ).then(response => {
+            toast.success("Order status updated successfully");
+            setLoaded(false); // Trigger re-fetching orders
+        }).catch(error => {
+            console.error("Error updating order status:", error);
+            toast.error("Failed to update order status");
+        });
+    }
 
     return (
         <div className="w-full h-full p-4 overflow-auto">
@@ -121,14 +138,7 @@ export default function AdminOrderPage() {
                                             <select 
                                                 value={order.states}
                                                 onChange={(e) => {
-                                                    e.stopPropagation();
-                                                    // Update order status logic here
-                                                    const updatedOrders = orders.map(o => 
-                                                        o.oderId === order.oderId 
-                                                            ? { ...o, states: e.target.value } 
-                                                            : o
-                                                    );
-                                                    setOrders(updatedOrders);
+                                                    changeOrderStatus(order.oderId, e.target.value)
                                                 }}
                                                 onClick={(e) => e.stopPropagation()}
                                                 className="border border-gray-300 rounded px-2 py-1"
@@ -154,35 +164,33 @@ export default function AdminOrderPage() {
                    {
                     modalIsDisplaying &&
                     <div className="fixed bg-[#00000080] top-0 left-0 w-full h-full flex justify-center items-center">
-                        <div className="w-[600px] max-w-[600px] h-[600px] max-h-[600px] bg-white relative rounded-lg flex flex-col items-center p-4">
-                            <div className="w-full h-[150px] rounded-t-lg">
+                        <div className="w-[600px] max-w-[600px] h-[600px] max-h-[600px] bg-white relative rounded-lg flex flex-col p-4">
+                            <button onClick={() => setModalIsDisplaying(false)} className="absolute -top-8 -right-8 z-10 rounded-full p-1">
+                                <IoMdCloseCircleOutline className="text-3xl text-white hover:text-red-700 cursor-pointer"/>
+                            </button>
+                            
+                            <div className="w-full flex-shrink-0 mb-4">
                                 <h1 className="text-sm font-bold p-2">Order ID: {displayingOrder.oderId}</h1>
                                 <h1 className="text-sm font-bold p-2">Order Date: {new Date(displayingOrder.Date).toLocaleDateString()}</h1>
                                 <h1 className="text-sm font-bold p-2">Order Status: {displayingOrder.states}</h1>
                                 <h1 className="text-sm font-bold p-2">Order Total: Rs{displayingOrder.total.toFixed(2)}</h1>
-                                
                             </div>
                             
-                            <button onClick={() => setModalIsDisplaying(false)} className="absolute -top-8 -right-8 z-10  rounded-full p-1">
-                                <IoMdCloseCircleOutline className="text-3xl text-white hover:text-red-700 cursor-pointer"/>
-                            </button>
-                            <div className="w-[600px] h-[400px] bg-white rounded-lg max-h-[400px] overflow-hidden">
-                                <div className="w-full h-[450px] max-h-[450px] overflow-y-scroll scrollbar-hide">
-                                    {displayingOrder.billItem.map(
-                                        (item,index)=>{
-                                            return (
-                                                <div key={index} className="w-full h-[100px] flex border-b-2 border-gray-300 p-2">
-                                                    <img src={item.Image} alt={item.productName} className="w-[80px] h-[80px] object-cover rounded-lg"/>
-                                                    <div className="ml-4 flex flex-col justify-center"> 
-                                                        <h1 className="font-bold">{item.productName}</h1>
-                                                        <h1>Quantity: {item.quantity}</h1>
-                                                        <h1>Price: Rs{item.price.toFixed(2)}</h1>   
-                                                    </div>
+                            <div className="flex-1 overflow-y-auto scrollbar-hide w-full">
+                                {displayingOrder.billItem.map(
+                                    (item,index)=>{
+                                        return (
+                                            <div key={index} className="w-full min-h-[100px] flex border-b-2 border-gray-300 p-2">
+                                                <img src={item.Image} alt={item.productName} className="w-[80px] h-[80px] object-cover rounded-lg"/>
+                                                <div className="ml-4 flex flex-col justify-center"> 
+                                                    <h1 className="font-bold">{item.productName}</h1>
+                                                    <h1>Quantity: {item.quantity}</h1>
+                                                    <h1>Price: Rs{item.price.toFixed(2)}</h1>   
                                                 </div>
-                                            )
-                                        }
-                                    )}
-                                </div>
+                                            </div>
+                                        )
+                                    }
+                                )}
                             </div>
                         </div>
                         
