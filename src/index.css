@@ -1,1 +1,7 @@
 @import "tailwindcss";
+
+@layer theme {
+    :root {
+        --color-accent: #FF6363;
+    }
+}

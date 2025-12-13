@@ -22,10 +22,10 @@ export default function ProductsPage(){
         )
 
     return(
-        <div className="h-full w-full ">
+        <div className="h-full w-full text-[var(--color-accent)]">
             {
                 productsLoaded?
-                    <div className="w-full h-full flex flex-wrap justify-center">
+                    <div className="w-full h-full flex flex-wrap justify-center text-[var(--color-accent)]">
                         {productList.map(
                             (product)=>{
                                 return(
