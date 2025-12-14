@@ -4,7 +4,7 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import { useState } from "react";
 
 export default function Header(){
-  const [isMenuOpen, setIsMenuOpen] = useState(true);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return(
   <header className="h-[70px] w-full flex justify-start items-center bg-gray-200 relative">
@@ -18,8 +18,8 @@ export default function Header(){
       </div>
       {
         isMenuOpen&&(
-        <div className="fixed top-0 left-0 bg-[#00000060] w-full h-screen flex"> 
-        <div className="bg-white z-[1000] w-[250px] h-full p-5 flex flex-col text-[var(--color-accent)] text-xl animate-slide-in">
+        <div className="lg:hidden fixed top-0 left-0 bg-[#00000060] w-full h-screen flex z-[9999]"> 
+        <div className="lg:hidden bg-white z-[10000] w-[250px] h-full p-5 flex flex-col text-[var(--color-accent)] text-xl animate-slide-in">
           <div className="w-full h-[70px] flex justify-end items-center">
             <button onClick={()=>{setIsMenuOpen(false)}} className="text-3xl font-bold">&times;</button>
           </div>

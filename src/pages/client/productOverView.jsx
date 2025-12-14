@@ -135,7 +135,7 @@ export default function ProductOverView() {
             
             {/* Background Box for Images and Thumbnails */}
             <div className="bg-gray-50 rounded-xl p-4 sm:p-6 w-full flex flex-col items-center">
-              <div className="w-full max-w-sm sm:max-w-md lg:max-w-lg h-[300px] sm:h-[350px] lg:h-[400px] xl:h-[450px] rounded-lg sm:rounded-xl overflow-hidden border border-gray-300 bg-green-900">
+              <div className="w-full max-w-sm sm:max-w-md lg:max-w-lg h-[300px] sm:h-[350px] lg:h-[400px] xl:h-[450px] rounded-lg sm:rounded-xl overflow-hidden border border-gray-300">
                 <img
                   src={selectedImage}
                   alt={product.name}
@@ -144,7 +144,7 @@ export default function ProductOverView() {
               </div>
 
               {/* Thumbnails */}
-              <div className="flex gap-2 sm:gap-3 mt-3 sm:mt-4 overflow-x-auto pb-2 w-full justify-center">
+              <div className="flex gap-2 sm:gap-3 mt-4 sm:mt-4 overflow-x-auto pb-2 w-full justify-center">
                 {product.images?.map((img, i) => (
                   <img
                     key={i}
