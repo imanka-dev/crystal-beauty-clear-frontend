@@ -13,7 +13,7 @@ export default function HomePage() {
       <div className="w-full h-[calc(100vh-70px)] min-h-[calc(100vh-70px)] ">
         <Routes>
           {/* ✅ Use relative paths, not absolute */}
-          <Route path="/" element={<HomePage />} />  
+          <Route path="/" element={<h1>Home Page</h1>} />
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/overview/:id" element={<ProductOverView />} />
           <Route path="/contact" element={<h1>Contact Us</h1>} />
